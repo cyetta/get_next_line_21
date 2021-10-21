@@ -8,33 +8,34 @@ SRCPATH = ./
 INCPATH = ./
 
 SRCS = ${addprefix ${SRCPATH}, ${SRCN}}
+BSRCS = ${addprefix ${SRCPATH}, ${BSRCN}}
 HDRS = ${addprefix ${INCPATH}, ${HDRN}}
-BSRCS = ${addprefix ${SOURCE}, ${BSRCN}}
 
 OBJ = ${SRCS:.c=.o}
-
 BOBJ = ${BSRCS:.c=.o}
+DPDS = ${SRCS:.c=.d} ${BSRCS:.c=.d}
 
 CC = gcc
 
 RM	= rm -f
 
-CFLAG = -Wall -Wextra -Werror -D BUFFER_SIZE=42
+CFLAG = -Wall -Wextra -Werror -g -D BUFFER_SIZE=42
 
-.c.o:
-	${CC} ${CFLAG} -c $< -o ${<:.c=.o} -I ${INCPATH}
+all:	${NAME}
 
 ${NAME}:	${OBJ}
 	${CC} ${CFLAG} -o $@ ${OBJ}
 
+%.o : %.c
+	${CC} ${CFLAG} -MMD -c $< -o $@ -I ${INCPATH}
 
-all:	${NAME}
+include ${wildcard ${DPDS}}
 
 bonus:
-#	@make  SRCN="${SRCN} ${BSRCN}" all
+	@make  SRCN="${SRCN} ${BSRCN}" all
 
 clean:
-	${RM} ${OBJ}
+	${RM} ${OBJ} ${BOBJ} ${DPDS}
 
 fclean:	clean
 	${RM} ${NAME}
