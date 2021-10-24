@@ -19,7 +19,7 @@ CC = gcc
 
 RM	= rm -f
 
-CFLAG = -Wall -Wextra -Werror -g -D BUFFER_SIZE=42
+CFLAG = -Wall -Wextra -Werror -D BUFFER_SIZE=42
 
 all:	${NAME}
 
@@ -31,8 +31,11 @@ ${NAME}:	${OBJ}
 
 include ${wildcard ${DPDS}}
 
+debug:
+	@make CFLAG="${CFLAG} -g" all
+
 bonus:
-	@make  SRCN="${SRCN} ${BSRCN}" all
+	@make SRCN="${SRCN} ${BSRCN}" all
 
 clean:
 	${RM} ${OBJ} ${BOBJ} ${DPDS}

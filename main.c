@@ -1,21 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/22 00:54:03 by cyetta            #+#    #+#             */
-/*   Updated: 2021/10/24 02:04:13 by cyetta           ###   ########.fr       */
+/*   Created: 2021/10/22 00:59:30 by cyetta            #+#    #+#             */
+/*   Updated: 2021/10/24 06:16:29 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# include <stddef.h>
+#include "get_next_line.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-char	*get_next_line(int fd);
-size_t	ft_strlen(const char *s);
-char	*ft_strdup(const char *s);
-void	*ft_memcpy(void *dst, const void *src, size_t n);
-#endif
+int	main(int argv, char **argc)
+{
+	char	*newline;
+
+	if (argv == 2)
+	{
+		printf("arg[1] - %s\n", argc[1]);
+		newline = get_next_line(5);
+		while (newline)
+		{
+			printf("%s", newline);
+			free(newline);
+			newline = get_next_line(5);
+		}
+	}
+}

@@ -1,6 +1,6 @@
 .idea/
 .vscode/
-main.*
 test
-Make_test
 *.o
+*.d
+en.subject.pdf
