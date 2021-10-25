@@ -6,7 +6,7 @@
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 00:14:13 by cyetta            #+#    #+#             */
-/*   Updated: 2021/10/25 21:53:51 by cyetta           ###   ########.fr       */
+/*   Updated: 2021/10/25 22:14:41 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,4 +93,5 @@ char	*get_next_line(int fd)
 			return (nextl);
 		fdesc->cnt = read(fdesc->fd, fdesc->buf, BUFFER_SIZE);
 	}
+	// read all data from fd, release memory and return (null)
 }
