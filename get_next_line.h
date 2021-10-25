@@ -6,19 +6,19 @@
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 00:54:03 by cyetta            #+#    #+#             */
-/*   Updated: 2021/10/24 02:04:13 by cyetta           ###   ########.fr       */
+/*   Updated: 2021/10/25 21:54:04 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # include <stddef.h>
-struct s_fdesc
+typedef struct s_fdesc
 {
-	char	*buf;
-	int		idx;
-	int		fd;
-} typedef fl_desc;
+	int			fd;
+	char		*buf;
+	ssize_t		cnt;
+}	t_fdesc;
 
 char	*get_next_line(int fd);
 size_t	ft_strlen(const char *s);
