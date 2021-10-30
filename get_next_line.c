@@ -6,7 +6,7 @@
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 00:14:13 by cyetta            #+#    #+#             */
-/*   Updated: 2021/10/30 02:07:53 by cyetta           ###   ########.fr       */
+/*   Updated: 2021/10/30 03:18:53 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ t_fdesc	*createfdesc(t_fdesc **fdesc, int fd)
 			free(*fdesc);
 			return (NULL);
 		}
+		(*fdesc)->cnt = BUFFER_SIZE;
 		(*fdesc)->fd = fd;
 		(*fdesc)->cnt = 0;
 	}
@@ -46,9 +47,9 @@ if \n founds - returns idx next char after \n,
 or retuns fd->cnt. if \n last char in fd-buf also
 retuns fd->cnt
 */
-size_t	find_nlidx(t_fdesc *fd)
+ssize_t	find_nlidx(t_fdesc *fd)
 {
-	size_t	fdbuf_cnt;
+	ssize_t	fdbuf_cnt;
 
 	fdbuf_cnt = -1;
 	while (++fdbuf_cnt < fd->cnt) //search \n & count idx
@@ -69,7 +70,7 @@ char	*addbuff2str(char *str, t_fdesc *fd)
 {
 	char	*newstr;
 	size_t	len;
-	size_t	fdbuf_cnt;
+	ssize_t	fdbuf_cnt;
 
 	len = 0;
 	if (str)

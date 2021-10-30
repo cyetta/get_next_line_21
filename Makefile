@@ -32,7 +32,7 @@ ${NAME}:	${OBJ}
 include ${wildcard ${DPDS}}
 
 debug:
-	@make CFLAG="${CFLAG} -g" all
+	@make CFLAG="${CFLAG} -g3" all
 
 bonus:
 	@make SRCN="${SRCN} ${BSRCN}" all

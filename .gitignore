@@ -1,6 +1,7 @@
 .idea/
 .vscode/
-test
+test*
 *.o
 *.d
 en.subject.pdf
+
