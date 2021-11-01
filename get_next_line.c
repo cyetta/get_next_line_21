@@ -6,7 +6,7 @@
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 00:14:13 by cyetta            #+#    #+#             */
-/*   Updated: 2021/10/30 03:18:53 by cyetta           ###   ########.fr       */
+/*   Updated: 2021/11/02 01:48:06 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@
 # define BUFFER_SIZE 4096
 #endif
 /*
-returns the actual file descriptor and pointer to it.
+returns the pointer to actual file descriptor
 if it doesn't exist, creates fdesc and initializes it.
 if an error occurred during creation, returns NULL
 */
-t_fdesc	*createfdesc(t_fdesc **fdesc, int fd)
+static t_fdesc	*createfdesc(t_fdesc **fdesc, int fd)
 {
 	if (!(*fdesc))
 	{
@@ -35,29 +35,10 @@ t_fdesc	*createfdesc(t_fdesc **fdesc, int fd)
 			free(*fdesc);
 			return (NULL);
 		}
-		(*fdesc)->cnt = BUFFER_SIZE;
 		(*fdesc)->fd = fd;
 		(*fdesc)->cnt = 0;
 	}
 	return (*fdesc);
-}
-
-/* finds idx first char of next line in the fd->buf
-if \n founds - returns idx next char after \n,
-or retuns fd->cnt. if \n last char in fd-buf also
-retuns fd->cnt
-*/
-ssize_t	find_nlidx(t_fdesc *fd)
-{
-	ssize_t	fdbuf_cnt;
-
-	fdbuf_cnt = -1;
-	while (++fdbuf_cnt < fd->cnt) //search \n & count idx
-		if (fd->buf[fdbuf_cnt] == '\n')
-			break ;
-	if (fdbuf_cnt < fd->cnt) // if found \n return char idx of next string
-		fdbuf_cnt++;
-	return (fdbuf_cnt);
 }
 
 /*
@@ -66,25 +47,27 @@ fdbuf_cnt - quantity char to copy from fd->buf, != 0
 returns NULL on allocation error
 the previose *str is released.
 */
-char	*addbuff2str(char *str, t_fdesc *fd)
+static char	*addbuff2str(char *str, size_t *str_len, t_fdesc *fd)
 {
 	char	*newstr;
-	size_t	len;
-	ssize_t	fdbuf_cnt;
+	int		fdbuf_cnt;
 
-	len = 0;
-	if (str)
-		len = ft_strlen(str);
-	fdbuf_cnt = find_nlidx(fd);
-	newstr = (char *)malloc(len + fdbuf_cnt + 1);
+	fdbuf_cnt = 0;
+	while (fdbuf_cnt < fd->cnt && fd->buf[fdbuf_cnt] != '\n')
+		++fdbuf_cnt;
+	if (fdbuf_cnt < fd->cnt)
+		++fdbuf_cnt;
+	newstr = (char *)malloc(*str_len + fdbuf_cnt + 1);
 	if (newstr)
 	{
-		if (len)
-			ft_memcpy(newstr, str, len);
-		ft_memcpy(newstr + len, fd->buf, fdbuf_cnt);
-		newstr[len + fdbuf_cnt + 1] = '\0';
-		ft_memcpy(fd->buf, fd->buf + fdbuf_cnt, fd->cnt - fdbuf_cnt);
+		if (*str_len)
+			ft_memcpy(newstr, str, *str_len);
+		ft_memcpy(newstr + *str_len, fd->buf, fdbuf_cnt);
+		newstr[*str_len + fdbuf_cnt] = '\0';
+		if (fd->cnt - fdbuf_cnt)
+			ft_memcpy(fd->buf, fd->buf + fdbuf_cnt, fd->cnt - fdbuf_cnt);
 		fd->cnt -= fdbuf_cnt;
+		*str_len += fdbuf_cnt;
 	}
 	if (str)
 		free(str);
@@ -95,23 +78,26 @@ char	*get_next_line(int fd)
 {
 	static t_fdesc	*fdesc = NULL;
 	char			*nextl;
+	size_t			nextl_len;
 
-	if (!createfdesc(&fdesc, fd))
+	if (fd < 0 || BUFFER_SIZE <= 0 || !createfdesc(&fdesc, fd))
 		return (NULL);
 	if (!fdesc->cnt)
-		fdesc->cnt = read(fdesc->fd, fdesc->buf, BUFFER_SIZE); // read stream fdesc->fd to fdesc-buf, first init
+		fdesc->cnt = read(fdesc->fd, fdesc->buf, BUFFER_SIZE);
 	nextl = NULL;
-	while (fdesc->cnt > 0) // try create nextl, while input flow isn`t empty
+	nextl_len = 0;
+	while (fdesc->cnt > 0)
 	{
-		nextl = addbuff2str(nextl, fdesc);
-		if (!nextl || nextl[ft_strlen(nextl) - 1] == '\n')
+		nextl = addbuff2str(nextl, &nextl_len, fdesc);
+		if (!nextl || nextl[nextl_len - 1] == '\n')
 			break ;
 		fdesc->cnt = read(fdesc->fd, fdesc->buf, BUFFER_SIZE);
 	}
-	if (!nextl) // read all data from fd, release memory and return (null)
+	if (!nextl)
 	{
 		free(fdesc->buf);
 		free(fdesc);
+		fdesc = NULL;
 	}
 	return (nextl);
 }
