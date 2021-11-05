@@ -2,7 +2,7 @@ NAME = test
 
 SRCN = main.c get_next_line.c get_next_line_utils.c
 HDRN = get_next_line.h
-BSRCN =
+BSRCN = main.c get_next_line_bonus.c get_next_line_utils_bonus.c
 
 SRCPATH = ./
 INCPATH = ./
@@ -35,7 +35,7 @@ debug:
 	@make CFLAG="${CFLAG} -g3" all
 
 bonus:
-	@make SRCN="${SRCN} ${BSRCN}" all
+	@make SRCN="${BSRCN}" debug
 
 clean:
 	${RM} ${OBJ} ${BOBJ} ${DPDS}
