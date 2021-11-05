@@ -1,41 +1,87 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 00:14:13 by cyetta            #+#    #+#             */
-/*   Updated: 2021/11/05 22:01:43 by cyetta           ###   ########.fr       */
+/*   Updated: 2021/11/05 21:50:28 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include <unistd.h>
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 /*
-returns the pointer to actual file descriptor
-if it doesn't exist, creates fdesc and initializes it.
-if an error occurred during creation, returns NULL
+FindFileDescriptor fd in the list *fdlisthead.
+Returns NULL, if it doesn't exist.
 */
-static t_fdesc	*createfdesc(t_fdesc **fdesc, int fd)
+t_fdesc	*findfdesc(t_fdesc *fdlsthead, int fd)
 {
-	if (!(*fdesc))
+	while (fdlsthead)
 	{
-		*fdesc = (t_fdesc *)malloc(sizeof(t_fdesc));
-		if (!(*fdesc))
-			return (NULL);
-		(*fdesc)->buf = (char *)malloc(sizeof(char) * BUFFER_SIZE);
-		if (!(*fdesc)->buf)
-		{
-			free(*fdesc);
-			return (NULL);
-		}
-		(*fdesc)->fd = fd;
-		(*fdesc)->cnt = 0;
+		if (fdlsthead->fd == fd)
+			break ;
+		fdlsthead = fdlsthead->next;
 	}
-	return (*fdesc);
+	return (fdlsthead);
+}
+
+/*
+Returns the pointer to actual file descriptor t_fdesc from list *fdlsthd.
+If it doesn't exist, creates, initializes and appends it to front in the list.
+If an error occurred during creation, returns NULL, fdlsthd doesn't changes.
+*/
+static t_fdesc	*createfdesc(t_fdesc **fdlsthd, int fd)
+{
+	t_fdesc	*fdesc;
+
+	if (fd < 0)
+		return (NULL);
+	fdesc = findfdesc(*fdlsthd, fd);
+	if (fdesc)
+		return (fdesc);
+	fdesc = (t_fdesc *)malloc(sizeof(t_fdesc));
+	if (!(fdesc))
+		return (NULL);
+	fdesc->buf = (char *)malloc(sizeof(char) * BUFFER_SIZE);
+	if (!fdesc->buf)
+	{
+		free(fdesc);
+		return (NULL);
+	}
+	fdesc->fd = fd;
+	fdesc->cnt = 0;
+	fdesc->next = *fdlsthd;
+	*fdlsthd = fdesc;
+	return (fdesc);
+}
+
+static void	freefdesc(t_fdesc **fdlsthd, int fd)
+{
+	t_fdesc	*prev;
+	t_fdesc	*curr;
+	t_fdesc	*next;
+
+	curr = *fdlsthd;
+	while (curr)
+	{
+		next = curr->next;
+		if (curr->fd == fd)
+		{
+			if (curr == *fdlsthd)
+				*fdlsthd = next;
+			else
+				prev->next = next;
+			free(curr->buf);
+			free(curr);
+		}
+		else
+			prev = curr;
+		curr = next;
+	}
 }
 
 /*
@@ -74,11 +120,13 @@ static char	*addbuff2str(char *str, size_t *str_len, t_fdesc *fd)
 
 char	*get_next_line(int fd)
 {
-	static t_fdesc	*fdesc = NULL;
+	static t_fdesc	*fdesclst = NULL;
+	t_fdesc			*fdesc;
 	char			*nextl;
 	size_t			nextl_len;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || !createfdesc(&fdesc, fd))
+	fdesc = createfdesc(&fdesclst, fd);
+	if (fd < 0 || BUFFER_SIZE <= 0 || !fdesc)
 		return (NULL);
 	if (!fdesc->cnt)
 		fdesc->cnt = read(fdesc->fd, fdesc->buf, BUFFER_SIZE);
@@ -92,10 +140,6 @@ char	*get_next_line(int fd)
 		fdesc->cnt = read(fdesc->fd, fdesc->buf, BUFFER_SIZE);
 	}
 	if (!nextl)
-	{
-		free(fdesc->buf);
-		free(fdesc);
-		fdesc = NULL;
-	}
+		freefdesc(&fdesclst, fd);
 	return (nextl);
 }

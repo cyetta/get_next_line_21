@@ -1,29 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/22 00:54:03 by cyetta            #+#    #+#             */
-/*   Updated: 2021/11/05 18:24:08 by cyetta           ###   ########.fr       */
+/*   Created: 2021/10/22 00:58:59 by cyetta            #+#    #+#             */
+/*   Updated: 2021/11/05 21:49:14 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 4096
-# endif
-# include <stddef.h>
+#include <stdlib.h>
 
-typedef struct s_fdesc
+void	*ft_memcpy(void *dst, const void *src, size_t n)
 {
-	int			fd;
-	char		*buf;
-	int			cnt;
-}	t_fdesc;
+	size_t	i;
 
-char	*get_next_line(int fd);
-void	*ft_memcpy(void *dst, const void *src, size_t n);
-#endif
+	if (dst == NULL && src == NULL)
+		return (NULL);
+	i = 0;
+	while (i < n)
+	{
+		((char *)dst)[i] = ((char *)src)[i];
+		++i;
+	}
+	return (dst);
+}
