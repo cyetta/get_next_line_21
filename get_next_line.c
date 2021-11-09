@@ -6,7 +6,7 @@
 /*   By: cyetta <cyetta@student.21-school.ru>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/22 00:14:13 by cyetta            #+#    #+#             */
-/*   Updated: 2021/11/05 22:01:43 by cyetta           ###   ########.fr       */
+/*   Updated: 2021/11/09 21:43:43 by cyetta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ char	*get_next_line(int fd)
 			break ;
 		fdesc->cnt = read(fdesc->fd, fdesc->buf, BUFFER_SIZE);
 	}
-	if (!nextl)
+	if (!nextl || (fdesc->cnt <= 0 && nextl[nextl_len - 1] != '\n'))
 	{
 		free(fdesc->buf);
 		free(fdesc);
